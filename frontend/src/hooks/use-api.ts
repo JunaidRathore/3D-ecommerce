@@ -19,7 +19,10 @@ import {
   PaymentIntent,
   CreatePaymentIntentRequest
 } from '@/types'
-import { apiClient } from '@/lib/api'
+import { getApiClient } from '@/lib/mock-api'
+
+// Get the appropriate API client (mock or real)
+const apiClient = getApiClient()
 
 // Query Keys
 export const queryKeys = {
