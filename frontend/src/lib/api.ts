@@ -1,28 +1,39 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios'
-import { useAuthStore } from '@/store/auth'
+import axios, { AxiosInstance, AxiosError } from 'axios'
 import { 
-  AuthResponse, 
   User, 
+  AuthUser, 
   Product, 
   ProductsResponse, 
   Cart, 
-  Order,
-  ProductCategory 
+  Order, 
+  ApiResponse, 
+  ApiError,
+  ProductFilters,
+  LoginCredentials,
+  RegisterData,
+  AddToCartRequest,
+  UpdateCartItemRequest,
+  CreateOrderRequest,
+  PaymentIntent,
+  CreatePaymentIntentRequest
 } from '@/types'
 
 class ApiClient {
-  private client: AxiosInstance
+  private axiosInstance: AxiosInstance
 
   constructor() {
-    this.client = axios.create({
+    this.axiosInstance = axios.create({
       baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
       timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
 
     // Request interceptor to add auth token
-    this.client.interceptors.request.use(
+    this.axiosInstance.interceptors.request.use(
       (config) => {
-        const token = useAuthStore.getState().token
+        const token = this.getAuthToken()
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
         }
@@ -31,148 +42,271 @@ class ApiClient {
       (error) => Promise.reject(error)
     )
 
-    // Response interceptor for error handling
-    this.client.interceptors.response.use(
+    // Response interceptor to handle errors
+    this.axiosInstance.interceptors.response.use(
       (response) => response,
-      (error: AxiosError) => {
+      (error: AxiosError<ApiError>) => {
         if (error.response?.status === 401) {
-          useAuthStore.getState().logout()
-          // Redirect to login if needed
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login'
-          }
+          this.clearAuthToken()
+          window.location.href = '/login'
         }
         return Promise.reject(error)
       }
     )
   }
 
+  private getAuthToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('authToken')
+    }
+    return null
+  }
+
+  private setAuthToken(token: string): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('authToken', token)
+    }
+  }
+
+  private clearAuthToken(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken')
+    }
+  }
+
   // Auth endpoints
-  async login(email: string, password: string): Promise<AuthResponse> {
-    const response = await this.client.post<AuthResponse>('/auth/login', {
-      email,
-      password,
-    })
-    return response.data
+  async login(credentials: LoginCredentials): Promise<AuthUser> {
+    const { data } = await this.axiosInstance.post<ApiResponse<AuthUser>>('/auth/login', credentials)
+    this.setAuthToken(data.data.accessToken)
+    return data.data
   }
 
-  async register(data: {
-    email: string
-    password: string
-    firstName: string
-    lastName: string
-    phone?: string
-    address?: string
-  }): Promise<AuthResponse> {
-    const response = await this.client.post<AuthResponse>('/auth/register', data)
-    return response.data
+  async register(userData: RegisterData): Promise<AuthUser> {
+    const { data } = await this.axiosInstance.post<ApiResponse<AuthUser>>('/auth/register', userData)
+    this.setAuthToken(data.data.accessToken)
+    return data.data
   }
 
-  async getProfile(): Promise<User> {
-    const response = await this.client.get<User>('/auth/profile')
-    return response.data
+  async logout(): Promise<void> {
+    try {
+      await this.axiosInstance.post('/auth/logout')
+    } finally {
+      this.clearAuthToken()
+    }
+  }
+
+  async refreshToken(): Promise<AuthUser> {
+    const { data } = await this.axiosInstance.post<ApiResponse<AuthUser>>('/auth/refresh')
+    this.setAuthToken(data.data.accessToken)
+    return data.data
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    await this.axiosInstance.post('/auth/forgot-password', { email })
+  }
+
+  async resetPassword(token: string, password: string): Promise<void> {
+    await this.axiosInstance.post('/auth/reset-password', { token, password })
   }
 
   // User endpoints
-  async updateProfile(data: Partial<User>): Promise<User> {
-    const response = await this.client.patch<User>('/users/me', data)
-    return response.data
+  async getCurrentUser(): Promise<User> {
+    const { data } = await this.axiosInstance.get<ApiResponse<User>>('/users/profile')
+    return data.data
+  }
+
+  async updateProfile(userData: Partial<User>): Promise<User> {
+    const { data } = await this.axiosInstance.patch<ApiResponse<User>>('/users/profile', userData)
+    return data.data
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await this.axiosInstance.patch('/users/change-password', {
+      currentPassword,
+      newPassword,
+    })
+  }
+
+  async deleteAccount(): Promise<void> {
+    await this.axiosInstance.delete('/users/profile')
+    this.clearAuthToken()
   }
 
   // Product endpoints
-  async getProducts(params?: {
-    page?: number
-    limit?: number
-    category?: ProductCategory
-    search?: string
-    minPrice?: number
-    maxPrice?: number
-    sortBy?: string
-    sortOrder?: 'ASC' | 'DESC'
-  }): Promise<ProductsResponse> {
-    const response = await this.client.get<ProductsResponse>('/products', { params })
-    return response.data
+  async getProducts(filters?: ProductFilters): Promise<ProductsResponse> {
+    const { data } = await this.axiosInstance.get<ApiResponse<ProductsResponse>>('/products', {
+      params: filters,
+    })
+    return data.data
   }
 
   async getProduct(id: string): Promise<Product> {
-    const response = await this.client.get<Product>(`/products/${id}`)
-    return response.data
+    const { data } = await this.axiosInstance.get<ApiResponse<Product>>(`/products/${id}`)
+    return data.data
   }
 
-  async getFeaturedProducts(limit?: number): Promise<Product[]> {
-    const response = await this.client.get<Product[]>('/products/featured', {
-      params: { limit },
+  async searchProducts(query: string, filters?: ProductFilters): Promise<ProductsResponse> {
+    const { data } = await this.axiosInstance.get<ApiResponse<ProductsResponse>>('/products/search', {
+      params: { query, ...filters },
     })
-    return response.data
+    return data.data
   }
 
-  async getProductsByCategory(category: ProductCategory): Promise<Product[]> {
-    const response = await this.client.get<Product[]>(`/products/category/${category}`)
-    return response.data
+  async getFeaturedProducts(): Promise<Product[]> {
+    const { data } = await this.axiosInstance.get<ApiResponse<Product[]>>('/products/featured')
+    return data.data
+  }
+
+  async getProductsByCategory(category: string): Promise<Product[]> {
+    const { data } = await this.axiosInstance.get<ApiResponse<Product[]>>(`/products/category/${category}`)
+    return data.data
+  }
+
+  async getProductRecommendations(productId: string): Promise<Product[]> {
+    const { data } = await this.axiosInstance.get<ApiResponse<Product[]>>(`/products/${productId}/recommendations`)
+    return data.data
   }
 
   // Cart endpoints
   async getCart(): Promise<Cart> {
-    const response = await this.client.get<Cart>('/cart')
-    return response.data
+    const { data } = await this.axiosInstance.get<ApiResponse<Cart>>('/cart')
+    return data.data
   }
 
   async addToCart(productId: string, quantity: number): Promise<Cart> {
-    const response = await this.client.post<Cart>('/cart/add', {
-      productId,
-      quantity,
-    })
-    return response.data
+    const request: AddToCartRequest = { productId, quantity }
+    const { data } = await this.axiosInstance.post<ApiResponse<Cart>>('/cart/items', request)
+    return data.data
   }
 
   async updateCartItem(itemId: string, quantity: number): Promise<Cart> {
-    const response = await this.client.patch<Cart>(`/cart/item/${itemId}`, {
-      quantity,
-    })
-    return response.data
+    const request: UpdateCartItemRequest = { quantity }
+    const { data } = await this.axiosInstance.patch<ApiResponse<Cart>>(`/cart/items/${itemId}`, request)
+    return data.data
   }
 
   async removeFromCart(itemId: string): Promise<Cart> {
-    const response = await this.client.delete<Cart>(`/cart/item/${itemId}`)
-    return response.data
+    const { data } = await this.axiosInstance.delete<ApiResponse<Cart>>(`/cart/items/${itemId}`)
+    return data.data
   }
 
   async clearCart(): Promise<Cart> {
-    const response = await this.client.delete<Cart>('/cart/clear')
-    return response.data
-  }
-
-  async getCartTotal(): Promise<number> {
-    const response = await this.client.get<number>('/cart/total')
-    return response.data
+    const { data } = await this.axiosInstance.delete<ApiResponse<Cart>>('/cart')
+    return data.data
   }
 
   // Order endpoints
-  async createOrder(data: {
-    shippingAddress: string
-    notes?: string
-  }): Promise<Order> {
-    const response = await this.client.post<Order>('/orders', data)
-    return response.data
-  }
-
   async getOrders(): Promise<Order[]> {
-    const response = await this.client.get<Order[]>('/orders')
-    return response.data
+    const { data } = await this.axiosInstance.get<ApiResponse<Order[]>>('/orders')
+    return data.data
   }
 
   async getOrder(id: string): Promise<Order> {
-    const response = await this.client.get<Order>(`/orders/${id}`)
-    return response.data
+    const { data } = await this.axiosInstance.get<ApiResponse<Order>>(`/orders/${id}`)
+    return data.data
+  }
+
+  async createOrder(orderData: CreateOrderRequest): Promise<Order> {
+    const { data } = await this.axiosInstance.post<ApiResponse<Order>>('/orders', orderData)
+    return data.data
+  }
+
+  async updateOrderStatus(id: string, status: string): Promise<Order> {
+    const { data } = await this.axiosInstance.patch<ApiResponse<Order>>(`/orders/${id}/status`, { status })
+    return data.data
+  }
+
+  async cancelOrder(id: string): Promise<Order> {
+    const { data } = await this.axiosInstance.patch<ApiResponse<Order>>(`/orders/${id}/cancel`)
+    return data.data
   }
 
   // Payment endpoints
-  async createPaymentIntent(orderId: string): Promise<{ clientSecret: string }> {
-    const response = await this.client.post<{ clientSecret: string }>('/payments/create-intent', {
-      orderId,
+  async createPaymentIntent(paymentData: CreatePaymentIntentRequest): Promise<PaymentIntent> {
+    const { data } = await this.axiosInstance.post<ApiResponse<PaymentIntent>>('/payments/create-intent', paymentData)
+    return data.data
+  }
+
+  async confirmPayment(paymentIntentId: string): Promise<PaymentIntent> {
+    const { data } = await this.axiosInstance.post<ApiResponse<PaymentIntent>>(`/payments/confirm/${paymentIntentId}`)
+    return data.data
+  }
+
+  async getPaymentMethods(): Promise<Array<{ id: string; type: string; last4?: string }>> {
+    const { data } = await this.axiosInstance.get<ApiResponse<Array<{ id: string; type: string; last4?: string }>>>('/payments/methods')
+    return data.data
+  }
+
+  async addPaymentMethod(paymentMethodId: string): Promise<void> {
+    await this.axiosInstance.post('/payments/methods', { paymentMethodId })
+  }
+
+  async removePaymentMethod(paymentMethodId: string): Promise<void> {
+    await this.axiosInstance.delete(`/payments/methods/${paymentMethodId}`)
+  }
+
+  // Utility methods
+  async uploadImage(file: File): Promise<string> {
+    const formData = new FormData()
+    formData.append('image', file)
+    
+    const { data } = await this.axiosInstance.post<ApiResponse<{ url: string }>>('/upload/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     })
-    return response.data
+    return data.data.url
+  }
+
+  async uploadModel3D(file: File): Promise<string> {
+    const formData = new FormData()
+    formData.append('model', file)
+    
+    const { data } = await this.axiosInstance.post<ApiResponse<{ url: string }>>('/upload/model', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return data.data.url
+  }
+
+  // Contact and support
+  async sendContactMessage(contactData: {
+    name: string
+    email: string
+    subject: string
+    message: string
+  }): Promise<void> {
+    await this.axiosInstance.post('/contact', contactData)
+  }
+
+  async subscribeToNewsletter(email: string): Promise<void> {
+    await this.axiosInstance.post('/newsletter/subscribe', { email })
+  }
+
+  async unsubscribeFromNewsletter(email: string): Promise<void> {
+    await this.axiosInstance.post('/newsletter/unsubscribe', { email })
+  }
+
+  // Analytics and tracking
+  async trackEvent(eventName: string, properties?: Record<string, unknown>): Promise<void> {
+    await this.axiosInstance.post('/analytics/track', {
+      event: eventName,
+      properties,
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  async trackPageView(page: string): Promise<void> {
+    await this.axiosInstance.post('/analytics/pageview', {
+      page,
+      timestamp: new Date().toISOString(),
+    })
   }
 }
 
-export const api = new ApiClient()
+// Create and export a single instance
+export const apiClient = new ApiClient()
+
+// Export the class for testing purposes
+export { ApiClient }

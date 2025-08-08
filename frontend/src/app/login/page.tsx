@@ -4,45 +4,54 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, ArrowLeft, ShoppingBag, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuthStore } from '@/store/auth'
-import { api } from '@/lib/api'
-
-interface LoginForm {
-  email: string
-  password: string
-}
+import { useLogin } from '@/hooks/use-api'
+import { loginSchema, type LoginFormData } from '@/lib/validations'
+import { toast } from '@/hooks/use-toast'
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  
   const router = useRouter()
-  const { login } = useAuthStore()
+  const { login: setAuthData } = useAuthStore()
   
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>()
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onChange',
+  })
 
-  const onSubmit = async (data: LoginForm) => {
-    setIsLoading(true)
-    setError('')
-    
-    try {
-      const authData = await api.login(data.email, data.password)
-      login(authData)
+  const loginMutation = useLogin({
+    onSuccess: (data) => {
+      setAuthData(data)
+      toast({
+        title: "Success",
+        description: "Welcome back! You have been logged in successfully.",
+      })
       router.push('/')
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid email or password')
-    } finally {
-      setIsLoading(false)
-    }
+    },
+    onError: (error) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Login failed. Please check your credentials.'
+      
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
+    },
+  })
+
+  const onSubmit = (data: LoginFormData) => {
+    loginMutation.mutate(data)
   }
 
   return (
@@ -84,13 +93,6 @@ const LoginPage = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {/* Error Message */}
-                {error && (
-                  <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-                    {error}
-                  </div>
-                )}
-
                 {/* Email Field */}
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium">
@@ -100,14 +102,9 @@ const LoginPage = () => {
                     id="email"
                     type="email"
                     placeholder="Enter your email"
-                    {...register('email', {
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Invalid email address',
-                      },
-                    })}
+                    {...register('email')}
                     className={errors.email ? 'border-red-500' : ''}
+                    disabled={loginMutation.isPending}
                   />
                   {errors.email && (
                     <p className="text-sm text-red-600">{errors.email.message}</p>
@@ -124,19 +121,15 @@ const LoginPage = () => {
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
-                      {...register('password', {
-                        required: 'Password is required',
-                        minLength: {
-                          value: 6,
-                          message: 'Password must be at least 6 characters',
-                        },
-                      })}
+                      {...register('password')}
                       className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                      disabled={loginMutation.isPending}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
+                      disabled={loginMutation.isPending}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50"
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -164,9 +157,9 @@ const LoginPage = () => {
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={isLoading}
+                  disabled={loginMutation.isPending}
                 >
-                  {isLoading ? (
+                  {loginMutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Signing in...
