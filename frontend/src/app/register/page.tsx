@@ -4,55 +4,60 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, ArrowLeft, ShoppingBag, Loader2, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuthStore } from '@/store/auth'
-import { api } from '@/lib/api'
-
-interface RegisterForm {
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-  confirmPassword: string
-  phone?: string
-  address?: string
-}
+import { useRegister } from '@/hooks/use-api'
+import { registerSchema, type RegisterFormData } from '@/lib/validations'
+import { toast } from '@/hooks/use-toast'
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
   
   const router = useRouter()
-  const { login } = useAuthStore()
+  const { login: setAuthData } = useAuthStore()
   
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<RegisterForm>()
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onChange',
+  })
 
   const password = watch('password')
 
-  const onSubmit = async (data: RegisterForm) => {
-    setIsLoading(true)
-    setError('')
-    
-    try {
-      const { confirmPassword, ...registerData } = data
-      const authData = await api.register(registerData)
-      login(authData)
+  const registerMutation = useRegister({
+    onSuccess: (data) => {
+      setAuthData(data)
+      toast({
+        title: "Success",
+        description: "Account created successfully! Welcome to our 3D shopping platform.",
+      })
       router.push('/')
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
+    },
+    onError: (error) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Registration failed. Please try again.'
+      
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
+    },
+  })
+
+  const onSubmit = (data: RegisterFormData) => {
+    const { confirmPassword, ...registerData } = data
+    registerMutation.mutate(registerData)
   }
 
   const passwordRequirements = [
@@ -101,13 +106,6 @@ const RegisterPage = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {/* Error Message */}
-                {error && (
-                  <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-                    {error}
-                  </div>
-                )}
-
                 {/* Name Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -117,14 +115,9 @@ const RegisterPage = () => {
                     <Input
                       id="firstName"
                       placeholder="John"
-                      {...register('firstName', {
-                        required: 'First name is required',
-                        minLength: {
-                          value: 2,
-                          message: 'First name must be at least 2 characters',
-                        },
-                      })}
+                      {...register('firstName')}
                       className={errors.firstName ? 'border-red-500' : ''}
+                      disabled={registerMutation.isPending}
                     />
                     {errors.firstName && (
                       <p className="text-sm text-red-600">{errors.firstName.message}</p>
@@ -138,14 +131,9 @@ const RegisterPage = () => {
                     <Input
                       id="lastName"
                       placeholder="Doe"
-                      {...register('lastName', {
-                        required: 'Last name is required',
-                        minLength: {
-                          value: 2,
-                          message: 'Last name must be at least 2 characters',
-                        },
-                      })}
+                      {...register('lastName')}
                       className={errors.lastName ? 'border-red-500' : ''}
+                      disabled={registerMutation.isPending}
                     />
                     {errors.lastName && (
                       <p className="text-sm text-red-600">{errors.lastName.message}</p>
@@ -162,14 +150,9 @@ const RegisterPage = () => {
                     id="email"
                     type="email"
                     placeholder="john@example.com"
-                    {...register('email', {
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Invalid email address',
-                      },
-                    })}
+                    {...register('email')}
                     className={errors.email ? 'border-red-500' : ''}
+                    disabled={registerMutation.isPending}
                   />
                   {errors.email && (
                     <p className="text-sm text-red-600">{errors.email.message}</p>
@@ -186,7 +169,11 @@ const RegisterPage = () => {
                     type="tel"
                     placeholder="+1 (555) 123-4567"
                     {...register('phone')}
+                    disabled={registerMutation.isPending}
                   />
+                  {errors.phone && (
+                    <p className="text-sm text-red-600">{errors.phone.message}</p>
+                  )}
                 </div>
 
                 {/* Password Field */}
@@ -199,19 +186,15 @@ const RegisterPage = () => {
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Create a strong password"
-                      {...register('password', {
-                        required: 'Password is required',
-                        minLength: {
-                          value: 6,
-                          message: 'Password must be at least 6 characters',
-                        },
-                      })}
+                      {...register('password')}
                       className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                      disabled={registerMutation.isPending}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
+                      disabled={registerMutation.isPending}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50"
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -253,17 +236,15 @@ const RegisterPage = () => {
                       id="confirmPassword"
                       type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="Confirm your password"
-                      {...register('confirmPassword', {
-                        required: 'Please confirm your password',
-                        validate: (value) =>
-                          value === password || 'Passwords do not match',
-                      })}
+                      {...register('confirmPassword')}
                       className={errors.confirmPassword ? 'border-red-500 pr-10' : 'pr-10'}
+                      disabled={registerMutation.isPending}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
+                      disabled={registerMutation.isPending}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground disabled:opacity-50"
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -286,7 +267,11 @@ const RegisterPage = () => {
                     id="address"
                     placeholder="123 Main St, City, State 12345"
                     {...register('address')}
+                    disabled={registerMutation.isPending}
                   />
+                  {errors.address && (
+                    <p className="text-sm text-red-600">{errors.address.message}</p>
+                  )}
                 </div>
 
                 {/* Terms and Conditions */}
@@ -306,9 +291,9 @@ const RegisterPage = () => {
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={isLoading}
+                  disabled={registerMutation.isPending}
                 >
-                  {isLoading ? (
+                  {registerMutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Creating account...

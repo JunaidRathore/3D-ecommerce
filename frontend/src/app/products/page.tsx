@@ -2,33 +2,79 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { Search, Filter, Grid3X3, List, Star, ShoppingCart, Eye, Loader2 } from 'lucide-react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Search, Grid3X3, List, Star, ShoppingCart, Eye, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import Header from '@/components/layout/header'
-import { api } from '@/lib/api'
-import { Product, ProductCategory, ProductsResponse } from '@/types'
+import { useProducts, useAddToCart } from '@/hooks/use-api'
+import { Product, ProductCategory, ProductFilters } from '@/types'
 import { formatPrice } from '@/lib/utils'
 import { useCartStore } from '@/store/cart'
+import { productFiltersSchema, type ProductFiltersFormData } from '@/lib/validations'
+import { toast } from '@/hooks/use-toast'
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [totalPages, setTotalPages] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [currentPage, setCurrentPage] = useState(1)
   
-  // Filters
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<ProductCategory | ''>('')
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' })
-  const [sortBy, setSortBy] = useState('createdAt')
-  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC')
-  
+  const router = useRouter()
   const searchParams = useSearchParams()
-  const { addItem } = useCartStore()
+  const { addLocalItem } = useCartStore()
+  
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductFiltersFormData>({
+    resolver: zodResolver(productFiltersSchema),
+    defaultValues: {
+      search: searchParams.get('search') || '',
+      category: (searchParams.get('category') as ProductCategory) || undefined,
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: 12,
+      sortBy: 'createdAt',
+      sortOrder: 'DESC',
+    },
+  })
+
+  const watchedFilters = watch()
+  
+  const {
+    data: productsResponse,
+    isLoading,
+    isError,
+    error
+  } = useProducts({
+    ...watchedFilters,
+    page: currentPage,
+  })
+
+  const addToCartMutation = useAddToCart({
+    onSuccess: (cart) => {
+      useCartStore.getState().setCart(cart)
+      toast({
+        title: "Success",
+        description: "Product added to cart successfully!",
+      })
+    },
+    onError: (error) => {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Failed to add product to cart'
+      
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      })
+    },
+  })
 
   const categories = [
     { value: '', label: 'All Categories' },
@@ -41,72 +87,50 @@ const ProductsPage = () => {
   ]
 
   const sortOptions = [
-    { value: 'createdAt', label: 'Newest First' },
-    { value: 'name', label: 'Name A-Z' },
-    { value: 'price', label: 'Price Low to High' },
-    { value: 'rating', label: 'Highest Rated' },
+    { value: 'createdAt-DESC', label: 'Newest First' },
+    { value: 'name-ASC', label: 'Name A-Z' },
+    { value: 'price-ASC', label: 'Price Low to High' },
+    { value: 'price-DESC', label: 'Price High to Low' },
+    { value: 'rating-DESC', label: 'Highest Rated' },
   ]
 
   useEffect(() => {
-    // Initialize from URL params
-    const search = searchParams.get('search')
-    const category = searchParams.get('category')
-    const page = searchParams.get('page')
+    // Update URL params when filters change
+    const params = new URLSearchParams()
     
-    if (search) setSearchQuery(search)
-    if (category) setSelectedCategory(category as ProductCategory)
-    if (page) setCurrentPage(parseInt(page))
-  }, [searchParams])
+    if (watchedFilters.search) params.set('search', watchedFilters.search)
+    if (watchedFilters.category) params.set('category', watchedFilters.category)
+    if (currentPage > 1) params.set('page', currentPage.toString())
+    
+    const newUrl = params.toString() ? `?${params.toString()}` : ''
+    router.replace(`/products${newUrl}`, { scroll: false })
+  }, [watchedFilters, currentPage, router])
 
-  useEffect(() => {
-    fetchProducts()
-  }, [currentPage, selectedCategory, searchQuery, priceRange, sortBy, sortOrder])
-
-  const fetchProducts = async () => {
-    setIsLoading(true)
-    try {
-      const params: any = {
-        page: currentPage,
-        limit: 12,
-        sortBy,
-        sortOrder,
-      }
-      
-      if (searchQuery) params.search = searchQuery
-      if (selectedCategory) params.category = selectedCategory
-      if (priceRange.min) params.minPrice = parseFloat(priceRange.min)
-      if (priceRange.max) params.maxPrice = parseFloat(priceRange.max)
-
-      const response: ProductsResponse = await api.getProducts(params)
-      setProducts(response.products)
-      setTotalPages(response.totalPages)
-    } catch (error) {
-      console.error('Failed to fetch products:', error)
-    } finally {
-      setIsLoading(false)
+  const handleAddToCart = (product: Product) => {
+    // Optimistic update
+    const cartItem = {
+      id: `${product.id}-${Date.now()}`,
+      product,
+      quantity: 1,
+      subtotal: Number(product.price),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     }
+    addLocalItem(cartItem)
+    
+    // Server update
+    addToCartMutation.mutate({ productId: product.id, quantity: 1 })
   }
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setCurrentPage(1)
-    fetchProducts()
+  const handleSortChange = (value: string) => {
+    const [sortBy, sortOrder] = value.split('-')
+    setValue('sortBy', sortBy as any)
+    setValue('sortOrder', sortOrder as 'ASC' | 'DESC')
   }
 
-  const handleAddToCart = async (product: Product) => {
-    try {
-      await api.addToCart(product.id, 1)
-      // Add to local state for immediate feedback
-      addItem({
-        id: `${product.id}-${Date.now()}`,
-        product,
-        quantity: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      })
-    } catch (error) {
-      console.error('Failed to add to cart:', error)
-    }
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const ProductCard = ({ product, isListView = false }: { product: Product; isListView?: boolean }) => (
@@ -140,9 +164,19 @@ const ProductsPage = () => {
               View
             </Button>
           </Link>
-          <Button size="sm" onClick={() => handleAddToCart(product)}>
-            <ShoppingCart className="w-4 h-4 mr-1" />
-            Add
+          <Button 
+            size="sm" 
+            onClick={() => handleAddToCart(product)}
+            disabled={addToCartMutation.isPending || product.stock === 0}
+          >
+            {addToCartMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <ShoppingCart className="w-4 h-4 mr-1" />
+                Add
+              </>
+            )}
           </Button>
         </div>
       </div>
@@ -184,7 +218,7 @@ const ProductsPage = () => {
               </span>
             )}
             <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <div className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
               <span className="text-sm text-muted-foreground">
                 {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
               </span>
@@ -221,80 +255,83 @@ const ProductsPage = () => {
         {/* Filters and Search */}
         <div className="mb-8">
           <Card className="p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-              {/* Search */}
-              <form onSubmit={handleSearch} className="lg:col-span-2">
-                <div className="relative">
+            <form onSubmit={handleSubmit(() => {})} className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                {/* Search */}
+                <div className="lg:col-span-2 relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    {...register('search')}
                     className="pl-10"
                   />
+                  {errors.search && (
+                    <p className="text-sm text-red-600 mt-1">{errors.search.message}</p>
+                  )}
                 </div>
-              </form>
+                
+                {/* Category Filter */}
+                <select
+                  {...register('category')}
+                  className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {categories.map((category) => (
+                    <option key={category.value} value={category.value}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+                
+                {/* Sort */}
+                <select
+                  value={`${watchedFilters.sortBy}-${watchedFilters.sortOrder}`}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               
-              {/* Category Filter */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value as ProductCategory | '')}
-                className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {categories.map((category) => (
-                  <option key={category.value} value={category.value}>
-                    {category.label}
-                  </option>
-                ))}
-              </select>
-              
-              {/* Sort */}
-              <select
-                value={`${sortBy}-${sortOrder}`}
-                onChange={(e) => {
-                  const [field, order] = e.target.value.split('-')
-                  setSortBy(field)
-                  setSortOrder(order as 'ASC' | 'DESC')
-                }}
-                className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={`${option.value}-${option.value === 'price' ? 'ASC' : 'DESC'}`}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Price Range */}
-            <div className="mt-4 flex items-center space-x-4">
-              <span className="text-sm font-medium">Price Range:</span>
-              <Input
-                type="number"
-                placeholder="Min"
-                value={priceRange.min}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                className="w-24"
-              />
-              <span className="text-muted-foreground">to</span>
-              <Input
-                type="number"
-                placeholder="Max"
-                value={priceRange.max}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                className="w-24"
-              />
-              <Button onClick={() => fetchProducts()} variant="outline" size="sm">
-                Apply
-              </Button>
-            </div>
+              {/* Price Range */}
+              <div className="flex items-center space-x-4">
+                <span className="text-sm font-medium">Price Range:</span>
+                <Input
+                  type="number"
+                  placeholder="Min"
+                  {...register('minPrice', { valueAsNumber: true })}
+                  className="w-24"
+                />
+                <span className="text-muted-foreground">to</span>
+                <Input
+                  type="number"
+                  placeholder="Max"
+                  {...register('maxPrice', { valueAsNumber: true })}
+                  className="w-24"
+                />
+                {(errors.minPrice || errors.maxPrice) && (
+                  <div className="text-sm text-red-600">
+                    {errors.minPrice?.message || errors.maxPrice?.message}
+                  </div>
+                )}
+              </div>
+            </form>
           </Card>
         </div>
 
         {/* Results Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="text-sm text-muted-foreground">
-            {isLoading ? 'Loading...' : `Showing ${products.length} products`}
+            {isLoading ? (
+              'Loading...'
+            ) : isError ? (
+              'Error loading products'
+            ) : (
+              `Showing ${productsResponse?.products.length || 0} of ${productsResponse?.totalCount || 0} products`
+            )}
           </div>
           
           {/* View Toggle */}
@@ -320,8 +357,17 @@ const ProductsPage = () => {
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin" />
+            <span className="ml-2 text-muted-foreground">Loading products...</span>
           </div>
-        ) : products.length === 0 ? (
+        ) : isError ? (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-medium mb-2">Error loading products</h3>
+            <p className="text-muted-foreground mb-4">
+              {error instanceof Error ? error.message : 'Something went wrong'}
+            </p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </div>
+        ) : !productsResponse?.products.length ? (
           <div className="text-center py-12">
             <h3 className="text-lg font-medium mb-2">No products found</h3>
             <p className="text-muted-foreground">Try adjusting your search or filters</p>
@@ -331,7 +377,7 @@ const ProductsPage = () => {
             ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' 
             : 'space-y-4'
           }>
-            {products.map((product) => (
+            {productsResponse.products.map((product) => (
               <ProductCard 
                 key={product.id} 
                 product={product} 
@@ -342,23 +388,25 @@ const ProductsPage = () => {
         )}
 
         {/* Pagination */}
-        {totalPages > 1 && (
+        {productsResponse && productsResponse.totalPages > 1 && (
           <div className="flex items-center justify-center space-x-2 mt-8">
             <Button
               variant="outline"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
+              onClick={() => handlePageChange(currentPage - 1)}
             >
               Previous
             </Button>
             
-            {[...Array(Math.min(5, totalPages))].map((_, i) => {
-              const page = i + 1
+            {[...Array(Math.min(5, productsResponse.totalPages))].map((_, i) => {
+              const page = Math.max(1, currentPage - 2) + i
+              if (page > productsResponse.totalPages) return null
+              
               return (
                 <Button
                   key={page}
                   variant={currentPage === page ? 'default' : 'outline'}
-                  onClick={() => setCurrentPage(page)}
+                  onClick={() => handlePageChange(page)}
                 >
                   {page}
                 </Button>
@@ -367,8 +415,8 @@ const ProductsPage = () => {
             
             <Button
               variant="outline"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === productsResponse.totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
             >
               Next
             </Button>
