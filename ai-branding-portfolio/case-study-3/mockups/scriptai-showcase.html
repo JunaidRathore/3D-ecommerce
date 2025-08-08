@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScriptAI Brand Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #F9FAFB;
+            color: #111827;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        
+        /* Logo Section */
+        .logo-section {
+            background: white;
+            padding: 80px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .logo-container {
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+        
+        .pen-nib {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #1E40AF 0%, #06B6D4 100%);
+            clip-path: polygon(50% 0%, 20% 40%, 50% 100%, 80% 40%);
+        }
+        
+        .data-streams {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+        
+        .stream {
+            position: absolute;
+            height: 4px;
+            background: linear-gradient(90deg, transparent 0%, #06B6D4 50%, transparent 100%);
+            border-radius: 2px;
+            animation: flow 3s ease-in-out infinite;
+        }
+        
+        .stream:nth-child(1) { top: 30%; width: 60%; left: 20%; animation-delay: 0s; }
+        .stream:nth-child(2) { top: 45%; width: 80%; left: 10%; animation-delay: 0.5s; }
+        .stream:nth-child(3) { top: 60%; width: 70%; left: 15%; animation-delay: 1s; }
+        .stream:nth-child(4) { top: 75%; width: 65%; left: 17.5%; animation-delay: 1.5s; }
+        
+        @keyframes flow {
+            0%, 100% { transform: translateX(-20%); opacity: 0; }
+            50% { transform: translateX(20%); opacity: 1; }
+        }
+        
+        .wordmark {
+            font-size: 64px;
+            font-weight: 700;
+            letter-spacing: -3px;
+            margin-bottom: 16px;
+        }
+        
+        .wordmark .ai {
+            background: linear-gradient(135deg, #F97316 0%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tagline {
+            font-size: 22px;
+            color: #6B7280;
+        }
+        
+        /* Product Variants */
+        .variants-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+        
+        .variants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+        
+        .variant-card {
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid #E5E7EB;
+            transition: all 0.3s;
+        }
+        
+        .variant-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .variant-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .creative { background: linear-gradient(135deg, #F97316 0%, #EC4899 100%); }
+        .business { background: #0891B2; }
+        .academic { background: #7C3AED; }
+        .technical { background: #059669; }
+        
+        .variant-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .variant-desc {
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        /* Desktop App Mockup */
+        .app-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .desktop-mockup {
+            background: #1F2937;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        .app-header {
+            background: #111827;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .light:nth-child(1) { background: #EF4444; }
+        .light:nth-child(2) { background: #F59E0B; }
+        .light:nth-child(3) { background: #10B981; }
+        
+        .app-title {
+            color: white;
+            font-weight: 600;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .editor-container {
+            display: grid;
+            grid-template-columns: 200px 1fr 300px;
+            height: 600px;
+        }
+        
+        .sidebar {
+            background: #F3F4F6;
+            padding: 24px;
+            border-right: 1px solid #E5E7EB;
+        }
+        
+        .file-tree {
+            font-size: 14px;
+        }
+        
+        .file-item {
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #4B5563;
+        }
+        
+        .file-item.active {
+            background: white;
+            color: #1E40AF;
+            font-weight: 600;
+        }
+        
+        .editor {
+            background: white;
+            padding: 40px;
+            font-family: 'iA Writer Quattro', 'Georgia', serif;
+            line-height: 1.8;
+            color: #1F2937;
+        }
+        
+        .editor h1 {
+            font-size: 32px;
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+        
+        .editor p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .ai-suggestion {
+            background: linear-gradient(135deg, #EBF8FF 0%, #F0FDFA 100%);
+            border-left: 4px solid #06B6D4;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-style: italic;
+            color: #0891B2;
+        }
+        
+        .ai-panel {
+            background: #F9FAFB;
+            padding: 24px;
+            border-left: 1px solid #E5E7EB;
+        }
+        
+        .ai-panel-header {
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .ai-indicator {
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .suggestion-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #E5E7EB;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .suggestion-card:hover {
+            border-color: #06B6D4;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.1);
+        }
+        
+        .suggestion-type {
+            font-size: 12px;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        
+        .suggestion-text {
+            font-size: 14px;
+            color: #1F2937;
+        }
+        
+        /* Mobile Mockup */
+        .mobile-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+        
+        .phone-mockup {
+            max-width: 320px;
+            margin: 40px auto 0;
+            background: #1F2937;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        .phone-screen {
+            background: white;
+            border-radius: 32px;
+            height: 600px;
+            overflow: hidden;
+        }
+        
+        .mobile-header {
+            background: #1E40AF;
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .mobile-nav {
+            display: flex;
+            justify-content: space-around;
+            background: #F3F4F6;
+            padding: 12px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6B7280;
+        }
+        
+        .nav-item.active {
+            background: white;
+            color: #1E40AF;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-content {
+            padding: 24px;
+        }
+        
+        .quick-capture {
+            background: #F9FAFB;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .capture-input {
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .ai-enhance-btn {
+            background: linear-gradient(135deg, #F97316 0%, #EC4899 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .recent-docs {
+            margin-top: 24px;
+        }
+        
+        .doc-item {
+            background: white;
+            border: 1px solid #E5E7EB;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .doc-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .doc-meta {
+            font-size: 14px;
+            color: #6B7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-container">
+                <div class="data-streams">
+                    <div class="stream"></div>
+                    <div class="stream"></div>
+                    <div class="stream"></div>
+                    <div class="stream"></div>
+                </div>
+                <div class="pen-nib"></div>
+            </div>
+            <div class="wordmark">Script<span class="ai">AI</span></div>
+            <div class="tagline">Your Voice, Amplified</div>
+        </div>
+        
+        <!-- Product Variants -->
+        <div class="variants-section">
+            <h2 class="section-title">Product Suite</h2>
+            <div class="variants-grid">
+                <div class="variant-card">
+                    <div class="variant-icon creative">✨</div>
+                    <div class="variant-name">Creative</div>
+                    <div class="variant-desc">For novelists, storytellers, and creative writers</div>
+                </div>
+                <div class="variant-card">
+                    <div class="variant-icon business">📊</div>
+                    <div class="variant-name">Business</div>
+                    <div class="variant-desc">Professional documents and marketing content</div>
+                </div>
+                <div class="variant-card">
+                    <div class="variant-icon academic">🎓</div>
+                    <div class="variant-name">Academic</div>
+                    <div class="variant-desc">Research papers and scholarly writing</div>
+                </div>
+                <div class="variant-card">
+                    <div class="variant-icon technical">💻</div>
+                    <div class="variant-name">Technical</div>
+                    <div class="variant-desc">Documentation and technical writing</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop App -->
+        <div class="app-section">
+            <h2 class="section-title">Desktop Writing Experience</h2>
+            <div class="desktop-mockup">
+                <div class="app-header">
+                    <div class="traffic-lights">
+                        <div class="light"></div>
+                        <div class="light"></div>
+                        <div class="light"></div>
+                    </div>
+                    <div class="app-title">ScriptAI - Chapter 3: The Discovery</div>
+                </div>
+                <div class="editor-container">
+                    <div class="sidebar">
+                        <div class="file-tree">
+                            <div class="file-item">📁 My Novel</div>
+                            <div class="file-item" style="margin-left: 20px;">📄 Chapter 1</div>
+                            <div class="file-item" style="margin-left: 20px;">📄 Chapter 2</div>
+                            <div class="file-item active" style="margin-left: 20px;">📄 Chapter 3</div>
+                            <div class="file-item" style="margin-left: 20px;">📄 Notes</div>
+                            <div class="file-item">📁 Research</div>
+                            <div class="file-item">📁 Characters</div>
+                        </div>
+                    </div>
+                    <div class="editor">
+                        <h1>Chapter 3: The Discovery</h1>
+                        <p>The morning fog clung to the cobblestone streets like a secret unwilling to be told. Sarah pulled her coat tighter as she approached the old library, its Gothic spires disappearing into the mist above.</p>
+                        <div class="ai-suggestion">
+                            AI Suggestion: Consider adding sensory details here - perhaps the smell of old books or the sound of her footsteps echoing in the empty street?
+                        </div>
+                        <p>Inside, the familiar scent of aged paper and leather bindings welcomed her. The librarian, Mrs. Chen, looked up from her desk with knowing eyes.</p>
+                        <p>"Back again, I see," she said, her voice barely above a whisper. "The archives are waiting for you."</p>
+                    </div>
+                    <div class="ai-panel">
+                        <div class="ai-panel-header">
+                            <div class="ai-indicator"></div>
+                            AI Assistant
+                        </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-type">Character Development</div>
+                            <div class="suggestion-text">Mrs. Chen could have a deeper connection to the mystery...</div>
+                        </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-type">Pacing</div>
+                            <div class="suggestion-text">The tension builds nicely here. Consider a brief flashback?</div>
+                        </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-type">Vocabulary</div>
+                            <div class="suggestion-text">"Gothic spires" - great imagery! Similar words: turrets, pinnacles...</div>
+                        </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-type">Plot Consistency</div>
+                            <div class="suggestion-text">Remember: In Chapter 1, Sarah mentioned she'd never been here before.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile App -->
+        <div class="mobile-section">
+            <h2 class="section-title">Mobile Writing Companion</h2>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="mobile-header">
+                        <div style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">ScriptAI</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Capture ideas anywhere</div>
+                    </div>
+                    <div class="mobile-nav">
+                        <div class="nav-item active">Capture</div>
+                        <div class="nav-item">Projects</div>
+                        <div class="nav-item">AI Tools</div>
+                        <div class="nav-item">Sync</div>
+                    </div>
+                    <div class="mobile-content">
+                        <div class="quick-capture">
+                            <div style="font-weight: 600; margin-bottom: 12px;">Quick Thought</div>
+                            <textarea class="capture-input" placeholder="Type or speak your idea..." rows="4"></textarea>
+                            <div class="ai-enhance-btn">Enhance with AI ✨</div>
+                        </div>
+                        
+                        <div class="recent-docs">
+                            <div style="font-weight: 600; margin-bottom: 12px;">Recent Documents</div>
+                            <div class="doc-item">
+                                <div class="doc-title">Chapter 3: The Discovery</div>
+                                <div class="doc-meta">Edited 2 hours ago • 2,847 words</div>
+                            </div>
+                            <div class="doc-item">
+                                <div class="doc-title">Character Profile: Mrs. Chen</div>
+                                <div class="doc-meta">Created yesterday • 523 words</div>
+                            </div>
+                            <div class="doc-item">
+                                <div class="doc-title">Plot Outline v3</div>
+                                <div class="doc-meta">Updated 3 days ago • 1,205 words</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI + Branding Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0F172A;
+            color: #F8FAFC;
+            line-height: 1.6;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+        }
+        
+        .hero h1 {
+            font-size: clamp(48px, 8vw, 96px);
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -3px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 24px;
+            color: #94A3B8;
+            max-width: 600px;
+            margin: 0 auto 48px;
+        }
+        
+        .portfolio-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            display: grid;
+            gap: 80px;
+        }
+        
+        .case-study {
+            background: #1E293B;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            transition: all 0.3s;
+        }
+        
+        .case-study:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.2);
+            border-color: #3B82F6;
+        }
+        
+        .case-header {
+            padding: 60px;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .case-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--brand-color) 0%, transparent 70%);
+            opacity: 0.1;
+        }
+        
+        .case-number {
+            font-size: 120px;
+            font-weight: 800;
+            opacity: 0.1;
+            position: absolute;
+            top: -20px;
+            right: 40px;
+        }
+        
+        .case-logo {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .case-tagline {
+            font-size: 18px;
+            color: #94A3B8;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .case-tags {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .case-content {
+            padding: 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+        
+        .case-details h3 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .case-details p {
+            color: #CBD5E1;
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .metric {
+            background: #0F172A;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--brand-color);
+            margin-bottom: 4px;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: #94A3B8;
+        }
+        
+        .case-visual {
+            background: #0F172A;
+            border-radius: 16px;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .visual-content {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .brand-icon {
+            width: 120px;
+            height: 120px;
+            background: var(--brand-color);
+            margin: 0 auto 24px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+        
+        .color-palette {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        
+        .color {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Brand-specific styles */
+        .aura { --brand-color: #7C3AED; }
+        .mediai { --brand-color: #0EA5E9; }
+        .scriptai { --brand-color: #F97316; }
+        .visioncore { --brand-color: #EA580C; }
+        .learnai { --brand-color: #2563EB; }
+        
+        .cta-section {
+            text-align: center;
+            padding: 120px 20px;
+            background: #1E293B;
+        }
+        
+        .cta-section h2 {
+            font-size: 48px;
+            margin-bottom: 24px;
+        }
+        
+        .cta-section p {
+            font-size: 20px;
+            color: #94A3B8;
+            margin-bottom: 48px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div>
+            <h1>AI + <span class="gradient-text">Branding</span></h1>
+            <p>5 Case Studies in Creating Human-Centered Identities for AI-Powered Companies</p>
+            <div class="cta-buttons">
+                <a href="#portfolio" class="btn btn-primary">View Portfolio</a>
+                <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+            </div>
+        </div>
+    </section>
+    
+    <section id="portfolio" class="portfolio-grid">
+        <!-- AURA -->
+        <div class="case-study aura">
+            <div class="case-header">
+                <div class="case-number">01</div>
+                <div class="case-logo">AURA</div>
+                <div class="case-tagline">AI-Powered Personal Styling Platform</div>
+                <div class="case-tags">
+                    <span class="tag">Fashion Tech</span>
+                    <span class="tag">B2C</span>
+                    <span class="tag">Mobile App</span>
+                </div>
+            </div>
+            <div class="case-content">
+                <div class="case-details">
+                    <h3>The Challenge</h3>
+                    <p>Democratize fashion expertise using AI while maintaining warmth and personality. Appeal to fashion-forward early adopters without alienating mainstream users.</p>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">12K+</div>
+                            <div class="metric-label">Pre-launch Signups</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$5.2M</div>
+                            <div class="metric-label">Series A Funding</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">4.8/5</div>
+                            <div class="metric-label">App Store Rating</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">45K+</div>
+                            <div class="metric-label">Monthly Active Users</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="case-visual">
+                    <div class="visual-content">
+                        <div class="brand-icon">A</div>
+                        <div class="color-palette">
+                            <div class="color" style="background: #7C3AED;"></div>
+                            <div class="color" style="background: #F472B6;"></div>
+                            <div class="color" style="background: #34D399;"></div>
+                            <div class="color" style="background: #111827;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MediAI -->
+        <div class="case-study mediai">
+            <div class="case-header">
+                <div class="case-number">02</div>
+                <div class="case-logo">MediAI</div>
+                <div class="case-tagline">Healthcare Intelligence Platform</div>
+                <div class="case-tags">
+                    <span class="tag">Healthcare</span>
+                    <span class="tag">B2B</span>
+                    <span class="tag">Enterprise</span>
+                </div>
+            </div>
+            <div class="case-content">
+                <div class="case-details">
+                    <h3>The Challenge</h3>
+                    <p>Build trust for AI in healthcare while appealing to both medical professionals and patients. Address healthcare industry's AI skepticism through transparent design.</p>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">147</div>
+                            <div class="metric-label">Hospital Systems</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">156%</div>
+                            <div class="metric-label">YoY Growth</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">43%</div>
+                            <div class="metric-label">Faster Diagnosis</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$47M</div>
+                            <div class="metric-label">Series B Funding</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="case-visual">
+                    <div class="visual-content">
+                        <div class="brand-icon">M</div>
+                        <div class="color-palette">
+                            <div class="color" style="background: #0EA5E9;"></div>
+                            <div class="color" style="background: #FF6B6B;"></div>
+                            <div class="color" style="background: #10B981;"></div>
+                            <div class="color" style="background: #8B5CF6;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ScriptAI -->
+        <div class="case-study scriptai">
+            <div class="case-header">
+                <div class="case-number">03</div>
+                <div class="case-logo">ScriptAI</div>
+                <div class="case-tagline">AI Writing Assistant Brand System</div>
+                <div class="case-tags">
+                    <span class="tag">Content Tech</span>
+                    <span class="tag">SaaS</span>
+                    <span class="tag">Multi-Product</span>
+                </div>
+            </div>
+            <div class="case-content">
+                <div class="case-details">
+                    <h3>The Challenge</h3>
+                    <p>Create a modular brand system for multiple product lines serving creative writers, businesses, academics, and technical teams without fragmentation.</p>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">2.3M+</div>
+                            <div class="metric-label">Active Users</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$12M</div>
+                            <div class="metric-label">ARR Year 1</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">87%</div>
+                            <div class="metric-label">Retention Rate</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">450+</div>
+                            <div class="metric-label">Enterprise Clients</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="case-visual">
+                    <div class="visual-content">
+                        <div class="brand-icon">S</div>
+                        <div class="color-palette">
+                            <div class="color" style="background: #1E40AF;"></div>
+                            <div class="color" style="background: #F97316;"></div>
+                            <div class="color" style="background: #06B6D4;"></div>
+                            <div class="color" style="background: #7C3AED;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- VisionCore -->
+        <div class="case-study visioncore">
+            <div class="case-header">
+                <div class="case-number">04</div>
+                <div class="case-logo">VisionCore</div>
+                <div class="case-tagline">Computer Vision Analytics Platform</div>
+                <div class="case-tags">
+                    <span class="tag">Enterprise AI</span>
+                    <span class="tag">Computer Vision</span>
+                    <span class="tag">Multi-Industry</span>
+                </div>
+            </div>
+            <div class="case-content">
+                <div class="case-details">
+                    <h3>The Challenge</h3>
+                    <p>Communicate complex AI processes to enterprise clients across retail, manufacturing, security, and smart cities while maintaining technical credibility.</p>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">67</div>
+                            <div class="metric-label">Fortune 500 Clients</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$580M</div>
+                            <div class="metric-label">Valuation</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">2.4B</div>
+                            <div class="metric-label">Images/Month</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">96%</div>
+                            <div class="metric-label">Renewal Rate</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="case-visual">
+                    <div class="visual-content">
+                        <div class="brand-icon">V</div>
+                        <div class="color-palette">
+                            <div class="color" style="background: #1E3A8A;"></div>
+                            <div class="color" style="background: #EA580C;"></div>
+                            <div class="color" style="background: #22C55E;"></div>
+                            <div class="color" style="background: #94A3B8;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LearnAI -->
+        <div class="case-study learnai">
+            <div class="case-header">
+                <div class="case-number">05</div>
+                <div class="case-logo">LearnAI</div>
+                <div class="case-tagline">Adaptive Learning Platform</div>
+                <div class="case-tags">
+                    <span class="tag">EdTech</span>
+                    <span class="tag">K-12 to Professional</span>
+                    <span class="tag">Adaptive UI</span>
+                </div>
+            </div>
+            <div class="case-content">
+                <div class="case-details">
+                    <h3>The Challenge</h3>
+                    <p>Create age-adaptive branding that grows with users from K-12 through professional development while gaining trust from educators and parents.</p>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">3.2M</div>
+                            <div class="metric-label">Active Learners</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">4,500+</div>
+                            <div class="metric-label">Schools</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">34%</div>
+                            <div class="metric-label">Score Improvement</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">92%</div>
+                            <div class="metric-label">Teacher Approval</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="case-visual">
+                    <div class="visual-content">
+                        <div class="brand-icon">L</div>
+                        <div class="color-palette">
+                            <div class="color" style="background: #2563EB;"></div>
+                            <div class="color" style="background: #10B981;"></div>
+                            <div class="color" style="background: #FCD34D;"></div>
+                            <div class="color" style="background: #A78BFA;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="contact" class="cta-section">
+        <h2>Ready to Create Your <span class="gradient-text">AI Brand</span>?</h2>
+        <p>Let's discuss how thoughtful branding can help your AI company build trust and connect with users.</p>
+        <div class="cta-buttons">
+            <a href="#" class="btn btn-primary">View on Behance</a>
+            <a href="#" class="btn btn-secondary">Connect on LinkedIn</a>
+        </div>
+    </section>
+</body>
+</html>

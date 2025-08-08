@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionCore Brand Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0F172A;
+            color: #F8FAFC;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        
+        /* Logo Section */
+        .logo-section {
+            background: #1E293B;
+            padding: 80px;
+            border-radius: 24px;
+            border: 1px solid #334155;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, #1E3A8A 0%, transparent 70%);
+            opacity: 0.1;
+            animation: pulse-bg 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-bg {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .logo {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hexagon-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 20px;
+        }
+        
+        .hexagon {
+            width: 50px;
+            height: 50px;
+            background: #1E3A8A;
+            clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+            transition: all 0.3s;
+        }
+        
+        .hexagon:nth-child(5) {
+            background: #EA580C;
+            transform: scale(1.2);
+        }
+        
+        .hexagon:hover {
+            background: #22C55E;
+            transform: scale(1.1);
+        }
+        
+        .wordmark {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .wordmark .core {
+            color: #EA580C;
+        }
+        
+        .tagline {
+            font-size: 20px;
+            color: #94A3B8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Industry Variants */
+        .variants-section {
+            background: #1E293B;
+            padding: 60px;
+            border-radius: 24px;
+            border: 1px solid #334155;
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+        
+        .variants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+        
+        .variant-card {
+            background: #0F172A;
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid #334155;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .variant-card:hover {
+            transform: translateY(-4px);
+            border-color: #EA580C;
+            box-shadow: 0 8px 24px rgba(234, 88, 12, 0.2);
+        }
+        
+        .variant-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            border-radius: 16px;
+        }
+        
+        .retail { background: #9333EA; }
+        .manufacturing { background: #FCD34D; color: #0F172A; }
+        .security { background: #DC2626; }
+        .smart-cities { background: #14B8A6; }
+        
+        .variant-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        /* Dashboard Mockup */
+        .dashboard-section {
+            background: #1E293B;
+            padding: 60px;
+            border-radius: 24px;
+            border: 1px solid #334155;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard {
+            background: #0F172A;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+        
+        .dashboard-header {
+            background: #1E293B;
+            padding: 20px 32px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dashboard-logo {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .dashboard-stats {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #22C55E;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #94A3B8;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo">
+                <div class="hexagon-grid">
+                    <div class="hexagon"></div>
+                    <div class="hexagon"></div>
+                    <div class="hexagon"></div>
+                    <div class="hexagon"></div>
+                    <div class="hexagon"></div>
+                    <div class="hexagon"></div>
+                    <div class="hexagon"></div>
+                    <div class="hexagon"></div>
+                    <div class="hexagon"></div>
+                </div>
+            </div>
+            <div class="wordmark">Vision<span class="core">Core</span></div>
+            <div class="tagline">SEE BEYOND DATA</div>
+        </div>
+        
+        <!-- Industry Variants -->
+        <div class="variants-section">
+            <h2 class="section-title">Industry Solutions</h2>
+            <div class="variants-grid">
+                <div class="variant-card">
+                    <div class="variant-icon retail">🛍️</div>
+                    <div class="variant-name">Retail Analytics</div>
+                </div>
+                <div class="variant-card">
+                    <div class="variant-icon manufacturing">🏭</div>
+                    <div class="variant-name">Manufacturing QC</div>
+                </div>
+                <div class="variant-card">
+                    <div class="variant-icon security">🛡️</div>
+                    <div class="variant-name">Security Systems</div>
+                </div>
+                <div class="variant-card">
+                    <div class="variant-icon smart-cities">🏙️</div>
+                    <div class="variant-name">Smart Cities</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Mockup -->
+        <div class="dashboard-section">
+            <h2 class="section-title">Enterprise Analytics Dashboard</h2>
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-logo">VisionCore</div>
+                    <div class="dashboard-stats">
+                        <div class="stat">
+                            <div class="stat-value">2,847</div>
+                            <div class="stat-label">Active Cameras</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">98.7%</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">1.2M</div>
+                            <div class="stat-label">Daily Events</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
