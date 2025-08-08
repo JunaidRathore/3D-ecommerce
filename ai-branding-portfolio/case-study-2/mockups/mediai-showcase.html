@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediAI Brand Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #F9FAFB;
+            color: #1F2937;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        
+        /* Logo Section */
+        .logo-section {
+            background: white;
+            padding: 80px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 240px;
+            height: 240px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+        
+        .helix {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .helix-strand {
+            position: absolute;
+            width: 8px;
+            height: 100%;
+            background: linear-gradient(180deg, #0EA5E9 0%, #8B5CF6 100%);
+            border-radius: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .helix-strand:nth-child(1) {
+            transform: translateX(-50%) rotate(45deg);
+        }
+        
+        .helix-strand:nth-child(2) {
+            transform: translateX(-50%) rotate(-45deg);
+        }
+        
+        .helix-nodes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .node {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #0EA5E9;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+        
+        .node:nth-child(1) { top: 20%; left: 30%; }
+        .node:nth-child(2) { top: 40%; right: 30%; background: #FF6B6B; }
+        .node:nth-child(3) { top: 60%; left: 30%; background: #10B981; }
+        .node:nth-child(4) { top: 80%; right: 30%; background: #8B5CF6; }
+        
+        .wordmark {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+        }
+        
+        .wordmark span {
+            color: #0EA5E9;
+        }
+        
+        .tagline {
+            font-size: 20px;
+            color: #6B7280;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Color Palette */
+        .color-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+        }
+        
+        .color-card {
+            text-align: center;
+        }
+        
+        .color-swatch {
+            width: 100%;
+            height: 100px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-end;
+            padding: 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .color-hex {
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        /* Dashboard Mockup */
+        .dashboard-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .dashboard {
+            background: #F9FAFB;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-header {
+            background: white;
+            padding: 24px 32px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dashboard-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0EA5E9;
+        }
+        
+        .dashboard-user {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .notification-badge {
+            width: 40px;
+            height: 40px;
+            background: #FEF3C7;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #FF6B6B;
+            border-radius: 50%;
+        }
+        
+        .dashboard-content {
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 32px;
+        }
+        
+        .main-content {
+            display: grid;
+            gap: 24px;
+        }
+        
+        .alert-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            border-left: 4px solid #FF6B6B;
+        }
+        
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .alert-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .alert-badge {
+            background: #FEE2E2;
+            color: #FF6B6B;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .patient-info {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .patient-avatar {
+            width: 48px;
+            height: 48px;
+            background: #E5E7EB;
+            border-radius: 12px;
+        }
+        
+        .patient-details {
+            flex: 1;
+        }
+        
+        .patient-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .patient-meta {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        .scan-preview {
+            background: #1F2937;
+            height: 200px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scan-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+        }
+        
+        .ai-indicator {
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0EA5E9;
+            margin-bottom: 4px;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: #6B7280;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: grid;
+            gap: 24px;
+        }
+        
+        .ai-insights {
+            background: linear-gradient(135deg, #0EA5E9 0%, #8B5CF6 100%);
+            padding: 24px;
+            border-radius: 16px;
+            color: white;
+        }
+        
+        .insights-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .insight-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .action-buttons {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .action-btn {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: #0EA5E9;
+            color: white;
+        }
+        
+        /* Mobile App */
+        .mobile-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+        
+        .phone-mockup {
+            max-width: 320px;
+            margin: 40px auto 0;
+            background: #1F2937;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        .phone-screen {
+            background: white;
+            border-radius: 32px;
+            height: 600px;
+            overflow: hidden;
+        }
+        
+        .patient-app {
+            padding: 24px;
+        }
+        
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        
+        .health-summary {
+            background: linear-gradient(135deg, #10B981 0%, #0EA5E9 100%);
+            padding: 24px;
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 24px;
+        }
+        
+        .health-score {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .health-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .recent-tests {
+            margin-bottom: 24px;
+        }
+        
+        .test-card {
+            background: #F9FAFB;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .test-name {
+            font-weight: 600;
+        }
+        
+        .test-status {
+            font-size: 14px;
+            color: #10B981;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo">
+                <div class="helix">
+                    <div class="helix-strand"></div>
+                    <div class="helix-strand"></div>
+                </div>
+                <div class="helix-nodes">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                </div>
+            </div>
+            <div class="wordmark">Medi<span>AI</span></div>
+            <div class="tagline">WHERE INTELLIGENCE MEETS CARE</div>
+        </div>
+        
+        <!-- Color Palette -->
+        <div class="color-section">
+            <h2 class="section-title">Brand Colors</h2>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #0EA5E9;">Primary</div>
+                    <div class="color-name">Healing Blue</div>
+                    <div class="color-hex">#0EA5E9</div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FF6B6B;">Secondary</div>
+                    <div class="color-name">Vitality Coral</div>
+                    <div class="color-hex">#FF6B6B</div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #10B981;">Accent</div>
+                    <div class="color-name">Data Green</div>
+                    <div class="color-hex">#10B981</div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #8B5CF6;">Support</div>
+                    <div class="color-name">Soft Purple</div>
+                    <div class="color-hex">#8B5CF6</div>
+                </div>
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #1F2937;">Neutral</div>
+                    <div class="color-name">Charcoal</div>
+                    <div class="color-hex">#1F2937</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Mockup -->
+        <div class="dashboard-section">
+            <h2 class="section-title">Medical Professional Dashboard</h2>
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div class="dashboard-logo">MediAI</div>
+                    <div class="dashboard-user">
+                        <div class="notification-badge">
+                            <div class="notification-dot"></div>
+                            🔔
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">Dr. Emily Chen</div>
+                            <div style="font-size: 14px; color: #6B7280;">Radiology</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-content">
+                    <div class="main-content">
+                        <div class="alert-card">
+                            <div class="alert-header">
+                                <div class="alert-title">AI Detection: Anomaly Found</div>
+                                <div class="alert-badge">HIGH PRIORITY</div>
+                            </div>
+                            <div class="patient-info">
+                                <div class="patient-avatar"></div>
+                                <div class="patient-details">
+                                    <div class="patient-name">Patient: John Morrison</div>
+                                    <div class="patient-meta">MRN: 784521 • Age: 52 • Chest CT Scan</div>
+                                </div>
+                            </div>
+                            <div class="scan-preview">
+                                <div class="scan-overlay">
+                                    <div class="ai-indicator">AI Confidence: 94%</div>
+                                </div>
+                            </div>
+                            <button class="action-btn btn-primary">Review Full Analysis</button>
+                        </div>
+                        
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value">147</div>
+                                <div class="metric-label">Scans Analyzed Today</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">12</div>
+                                <div class="metric-label">Flagged for Review</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">98.7%</div>
+                                <div class="metric-label">Accuracy Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar">
+                        <div class="ai-insights">
+                            <div class="insights-title">AI Insights</div>
+                            <div class="insight-item">• 3 similar cases found in database</div>
+                            <div class="insight-item">• Recommended: Additional lateral view</div>
+                            <div class="insight-item">• Pattern matches early-stage indicators</div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <div class="action-btn">Request Consultation</div>
+                            <div class="action-btn">View Similar Cases</div>
+                            <div class="action-btn">Generate Report</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile App -->
+        <div class="mobile-section">
+            <h2 class="section-title">Patient Mobile Experience</h2>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="patient-app">
+                        <div class="app-header">
+                            <div style="font-size: 24px; font-weight: 700;">MediAI</div>
+                            <div style="width: 40px; height: 40px; background: #F3F4F6; border-radius: 50%;"></div>
+                        </div>
+                        
+                        <div class="health-summary">
+                            <div class="health-score">94</div>
+                            <div class="health-label">Your Health Score</div>
+                            <div style="margin-top: 12px; font-size: 14px;">Based on your recent tests and AI analysis</div>
+                        </div>
+                        
+                        <div class="recent-tests">
+                            <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600;">Recent Tests</h3>
+                            <div class="test-card">
+                                <div>
+                                    <div class="test-name">Blood Work</div>
+                                    <div style="font-size: 14px; color: #6B7280;">March 15, 2024</div>
+                                </div>
+                                <div class="test-status">Normal</div>
+                            </div>
+                            <div class="test-card">
+                                <div>
+                                    <div class="test-name">Chest X-Ray</div>
+                                    <div style="font-size: 14px; color: #6B7280;">March 10, 2024</div>
+                                </div>
+                                <div class="test-status">Clear</div>
+                            </div>
+                            <div class="test-card">
+                                <div>
+                                    <div class="test-name">ECG</div>
+                                    <div style="font-size: 14px; color: #6B7280;">March 8, 2024</div>
+                                </div>
+                                <div class="test-status" style="color: #F59E0B;">Review Notes</div>
+                            </div>
+                        </div>
+                        
+                        <button class="action-btn btn-primary" style="width: 100%;">Schedule Appointment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

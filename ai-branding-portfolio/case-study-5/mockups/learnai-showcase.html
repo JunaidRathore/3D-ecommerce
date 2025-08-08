@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnAI Brand Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #F9FAFB;
+            color: #111827;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        
+        /* Logo Section */
+        .logo-section {
+            background: white;
+            padding: 80px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 240px;
+            height: 240px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+        
+        .brain-network {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .node {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2563EB;
+        }
+        
+        .node:nth-child(1) { top: 20%; left: 50%; transform: translateX(-50%); background: #10B981; }
+        .node:nth-child(2) { top: 35%; left: 25%; background: #FCD34D; }
+        .node:nth-child(3) { top: 35%; right: 25%; background: #A78BFA; }
+        .node:nth-child(4) { top: 50%; left: 15%; }
+        .node:nth-child(5) { top: 50%; right: 15%; background: #10B981; }
+        .node:nth-child(6) { top: 65%; left: 30%; background: #A78BFA; }
+        .node:nth-child(7) { top: 65%; right: 30%; background: #FCD34D; }
+        .node:nth-child(8) { bottom: 20%; left: 50%; transform: translateX(-50%); }
+        
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: #E5E7EB;
+            transform-origin: left center;
+        }
+        
+        .connection:nth-child(9) { top: 28%; left: 50%; width: 80px; transform: rotate(135deg); }
+        .connection:nth-child(10) { top: 28%; right: 50%; width: 80px; transform: rotate(45deg); }
+        .connection:nth-child(11) { top: 42%; left: 25%; width: 60px; transform: rotate(30deg); }
+        .connection:nth-child(12) { top: 42%; right: 25%; width: 60px; transform: rotate(-30deg); }
+        
+        .wordmark {
+            font-size: 64px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+        }
+        
+        .wordmark .ai {
+            color: #2563EB;
+        }
+        
+        .tagline {
+            font-size: 22px;
+            color: #6B7280;
+        }
+        
+        /* Age Variants */
+        .variants-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+        
+        .age-tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #E5E7EB;
+        }
+        
+        .age-tab {
+            padding: 16px 32px;
+            font-weight: 600;
+            color: #6B7280;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+        
+        .age-tab.active {
+            color: #2563EB;
+            border-bottom-color: #2563EB;
+        }
+        
+        .interface-preview {
+            background: #F3F4F6;
+            border-radius: 16px;
+            padding: 40px;
+            min-height: 400px;
+        }
+        
+        /* K-12 Interface */
+        .k12-interface {
+            text-align: center;
+        }
+        
+        .mascot {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+            border-radius: 60% 40% 40% 60%;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+        
+        .welcome-message {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: #1F2937;
+        }
+        
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .subject-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .subject-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: #10B981;
+        }
+        
+        .subject-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .subject-name {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        /* Dashboard Section */
+        .dashboard-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .dashboard {
+            background: #F9FAFB;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .dashboard-header {
+            background: white;
+            padding: 24px 32px;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #2563EB 0%, #A78BFA 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        
+        .student-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .student-level {
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        .streak-badge {
+            background: #FEF3C7;
+            color: #F59E0B;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dashboard-content {
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 32px;
+        }
+        
+        .learning-path {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+        }
+        
+        .path-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        
+        .path-progress {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 12px;
+            background: #E5E7EB;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10B981 0%, #2563EB 100%);
+            width: 65%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            font-weight: 600;
+            color: #2563EB;
+        }
+        
+        .lesson-list {
+            display: grid;
+            gap: 16px;
+        }
+        
+        .lesson-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #F9FAFB;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lesson-item:hover {
+            background: #F3F4F6;
+            transform: translateX(4px);
+        }
+        
+        .lesson-status {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .completed { background: #10B981; color: white; }
+        .current { background: #2563EB; color: white; }
+        .locked { background: #E5E7EB; color: #9CA3AF; }
+        
+        .stats-panel {
+            display: grid;
+            gap: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        /* Mobile Section */
+        .mobile-section {
+            background: white;
+            padding: 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+        
+        .phone-mockup {
+            max-width: 320px;
+            margin: 40px auto 0;
+            background: #1F2937;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        .phone-screen {
+            background: white;
+            border-radius: 32px;
+            height: 600px;
+            overflow: hidden;
+        }
+        
+        .mobile-header {
+            background: linear-gradient(135deg, #2563EB 0%, #A78BFA 100%);
+            color: white;
+            padding: 24px;
+        }
+        
+        .mobile-greeting {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .mobile-subtitle {
+            opacity: 0.9;
+        }
+        
+        .quick-actions {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .action-card {
+            background: #F9FAFB;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-card:hover {
+            background: #F3F4F6;
+            transform: translateY(-2px);
+        }
+        
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .action-label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #374151;
+        }
+        
+        .daily-goal {
+            margin: 0 24px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .goal-progress {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .goal-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo">
+                <div class="brain-network">
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="connection"></div>
+                    <div class="connection"></div>
+                    <div class="connection"></div>
+                    <div class="connection"></div>
+                </div>
+            </div>
+            <div class="wordmark">Learn<span class="ai">AI</span></div>
+            <div class="tagline">Learn at the Speed of You</div>
+        </div>
+        
+        <!-- Age Variants -->
+        <div class="variants-section">
+            <h2 class="section-title">Adaptive Interface Design</h2>
+            <div class="age-tabs">
+                <div class="age-tab active">K-12 Students</div>
+                <div class="age-tab">University</div>
+                <div class="age-tab">Professional</div>
+            </div>
+            <div class="interface-preview">
+                <div class="k12-interface">
+                    <div class="mascot">🤖</div>
+                    <div class="welcome-message">Hi Emma! Ready to learn something awesome?</div>
+                    <div class="subject-grid">
+                        <div class="subject-card">
+                            <div class="subject-icon">🔢</div>
+                            <div class="subject-name">Math Magic</div>
+                        </div>
+                        <div class="subject-card">
+                            <div class="subject-icon">🔬</div>
+                            <div class="subject-name">Science Lab</div>
+                        </div>
+                        <div class="subject-card">
+                            <div class="subject-icon">📚</div>
+                            <div class="subject-name">Reading Quest</div>
+                        </div>
+                        <div class="subject-card">
+                            <div class="subject-icon">🎨</div>
+                            <div class="subject-name">Art Studio</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard -->
+        <div class="dashboard-section">
+            <h2 class="section-title">Student Learning Dashboard</h2>
+            <div class="dashboard">
+                <div class="dashboard-header">
+                    <div class="student-info">
+                        <div class="avatar">JD</div>
+                        <div>
+                            <div class="student-name">Jake Davidson</div>
+                            <div class="student-level">Grade 7 • Level 24</div>
+                        </div>
+                    </div>
+                    <div class="streak-badge">
+                        🔥 15 Day Streak!
+                    </div>
+                </div>
+                <div class="dashboard-content">
+                    <div class="learning-path">
+                        <div class="path-header">Today's Learning Path</div>
+                        <div class="path-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="progress-text">65%</div>
+                        </div>
+                        <div class="lesson-list">
+                            <div class="lesson-item">
+                                <div class="lesson-status completed">✓</div>
+                                <div>
+                                    <div style="font-weight: 600;">Algebra Basics</div>
+                                    <div style="font-size: 14px; color: #6B7280;">Completed • 100% accuracy</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-status current">▶</div>
+                                <div>
+                                    <div style="font-weight: 600;">Solving Equations</div>
+                                    <div style="font-size: 14px; color: #6B7280;">In Progress • 15 min left</div>
+                                </div>
+                            </div>
+                            <div class="lesson-item">
+                                <div class="lesson-status locked">🔒</div>
+                                <div>
+                                    <div style="font-weight: 600;">Advanced Problems</div>
+                                    <div style="font-size: 14px; color: #6B7280;">Unlock after current lesson</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-panel">
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-value">2,450</div>
+                            <div class="stat-label">XP Points</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-value">18</div>
+                            <div class="stat-label">Achievements</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-value">87%</div>
+                            <div class="stat-label">Mastery Score</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile App -->
+        <div class="mobile-section">
+            <h2 class="section-title">Mobile Learning Experience</h2>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="mobile-header">
+                        <div class="mobile-greeting">Good Morning!</div>
+                        <div class="mobile-subtitle">Let's make today count</div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <div class="action-card">
+                            <div class="action-icon">📖</div>
+                            <div class="action-label">Continue Learning</div>
+                        </div>
+                        <div class="action-card">
+                            <div class="action-icon">🎯</div>
+                            <div class="action-label">Practice Quiz</div>
+                        </div>
+                        <div class="action-card">
+                            <div class="action-icon">👥</div>
+                            <div class="action-label">Study Groups</div>
+                        </div>
+                        <div class="action-card">
+                            <div class="action-icon">📱</div>
+                            <div class="action-label">AR Helper</div>
+                        </div>
+                    </div>
+                    
+                    <div class="daily-goal">
+                        <div class="goal-progress">3/5</div>
+                        <div class="goal-text">Lessons completed today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
